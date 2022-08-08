@@ -3,6 +3,7 @@ package jm.task.core.jdbc.model;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Formatter;
 
 @Table
 public class User {
@@ -58,5 +59,12 @@ public class User {
 
     public void setAge(Byte age) {
         this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        Formatter f = new Formatter();
+        f.format("Пользователю %s %s %d лет", name, lastName, age);
+        return f.toString();
     }
 }
