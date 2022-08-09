@@ -32,8 +32,9 @@ public class UserDaoJDBCImpl implements UserDao {
         try {
             executeQuery(CREATE_USER_TABLE);
         }
-        catch (SQLException ignore) {
+        catch (SQLException e) {
             System.out.println("Произошла ошибка при создании таблицы User. Изменения отменены.");
+            e.printStackTrace();
         }
     }
 
@@ -42,8 +43,9 @@ public class UserDaoJDBCImpl implements UserDao {
         try {
             executeQuery(DROP_USER_TABLE);
         }
-        catch (SQLException ignore) {
+        catch (SQLException e) {
             System.out.println("Произошла ошибка при удалении таблицы User. Изменения отменены.");
+            e.printStackTrace();
         }
     }
 
@@ -75,8 +77,8 @@ public class UserDaoJDBCImpl implements UserDao {
             }
             catch (SQLException ignore) {
                 System.out.println("При попытке добавления пользователя произошла ошибка. Изменения отменены.");
+                e.printStackTrace();
             }
-            throw new RuntimeException(e);
         }
     }
 
@@ -89,13 +91,13 @@ public class UserDaoJDBCImpl implements UserDao {
             statement.execute();
             connection.commit();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            connection.rollback();
-        }
-        catch (SQLException ignore) {
-            System.out.println("При попытке удаления пользователя произошла ошибка. Изменения отменены.");
+            try {
+                connection.rollback();
+            }
+            catch (SQLException ignore) {
+                System.out.println("При попытке удаления пользователя произошла ошибка. Изменения отменены.");
+                e.printStackTrace();
+            }
         }
     }
 
@@ -108,7 +110,7 @@ public class UserDaoJDBCImpl implements UserDao {
             statement = connection.createStatement();
             data = statement.executeQuery(SELECT_ALL_USERS);
             while (data.next()) {
-                users.add(new User(data.getString(2), data.getString(3), data.getByte(4)));
+                users.add(new User(data.getString("name"), data.getString("last_name"), data.getByte("age")));
             }
         } catch (SQLException e) {
             try {
@@ -116,8 +118,8 @@ public class UserDaoJDBCImpl implements UserDao {
             }
             catch (SQLException ignore) {
                 System.out.println("При попытке получения списка пользователей произошла ошибка. Изменения отменены.");
+                e.printStackTrace();
             }
-            throw new RuntimeException(e);
         }
         return users;
     }
@@ -127,8 +129,9 @@ public class UserDaoJDBCImpl implements UserDao {
         try {
             executeQuery(CLEAN_USERS_TABLE);
         }
-        catch (SQLException ignore) {
+        catch (SQLException e) {
             System.out.println("Произошла ошибка при очистки таблицы User. Изменения отменены.");
+            e.printStackTrace();
         }
     }
 }

@@ -9,35 +9,31 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class Util {
+    private static final String DB_URL;
+    private static final String DB_USERNAME;
+    private static final String DB_PASSWORD;
 
-    public static Connection getConnection() {
-        String DB_URL = "";
-        String DB_USERNAME = "";
-        String DB_PASSWORD = "";
-
-        FileInputStream fis;
+    static {
         Properties properties = new Properties();
 
-        try {
+        try (FileInputStream fis = new FileInputStream("resources/config.properties")) {
             // Берём URL БД, имя пользователя и пароль из файла config.properties
-            fis = new FileInputStream("src/main/resources/config.properties");
             properties.load(fis);
             DB_URL = properties.getProperty("DB_URL");
             DB_USERNAME = properties.getProperty("DB_USERNAME");
             DB_PASSWORD = properties.getProperty("DB_PASSWORD");
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
+    }
+    public static Connection getConnection() {
 
         Connection connection = null;
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
-            throw new IllegalStateException("Cannot find the driver in the classpath!", e);
+            throw new IllegalStateException("Не удалось найти драйвер!", e);
         }
 
         try {
@@ -46,7 +42,7 @@ public class Util {
             connection.setAutoCommit(false);
         }
         catch (SQLException throwable) {
-            throwable.printStackTrace();
+            throw new RuntimeException(throwable);
         }
         return connection;
     }
