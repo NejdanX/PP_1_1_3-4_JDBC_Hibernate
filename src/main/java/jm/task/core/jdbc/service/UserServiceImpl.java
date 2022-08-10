@@ -1,34 +1,34 @@
 package jm.task.core.jdbc.service;
 
+import jm.task.core.jdbc.dao.UserDaoHibernateImpl;
 import jm.task.core.jdbc.dao.UserDaoJDBCImpl;
 import jm.task.core.jdbc.model.User;
 
 import java.util.List;
 
 public class UserServiceImpl implements UserService {
-    UserDaoJDBCImpl userDaoObj = new UserDaoJDBCImpl();
+    UserDaoHibernateImpl userDaoHibernateObj = new UserDaoHibernateImpl();
     public void createUsersTable() {
-        userDaoObj.createUsersTable();
+        userDaoHibernateObj.createUsersTable();
     }
 
     public void dropUsersTable() {
-        userDaoObj.dropUsersTable();
+        userDaoHibernateObj.dropUsersTable();
     }
 
     public void saveUser(String name, String lastName, byte age) {
-        userDaoObj.saveUser(name, lastName, age);
-        System.out.printf("User с именем – %s добавлен в базу данных\n", name);
+        userDaoHibernateObj.saveUser(name, lastName, age);
     }
 
     public void removeUserById(long id) {
-        userDaoObj.removeUserById(id);
+        userDaoHibernateObj.removeUserById(id);
     }
 
     public List<User> getAllUsers() {
-        return userDaoObj.getAllUsers();
+        return userDaoHibernateObj.getAllUsers();
     }
 
     public void cleanUsersTable() {
-        userDaoObj.cleanUsersTable();
+        userDaoHibernateObj.cleanUsersTable();
     }
 }
