@@ -8,6 +8,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
+
+    String CREATE_USER_TABLE = "CREATE TABLE IF NOT EXISTS User (" +
+            "id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT, " +
+            "name VARCHAR(25), " +
+            "last_name VARCHAR(25), " +
+            "age TINYINT UNSIGNED)";
+
+    String DROP_USER_TABLE = "DROP TABLE IF EXISTS User";
+    String ADD_NEW_USER = "INSERT INTO user(name, last_name, age) VALUES (?, ?, ?)";
+    String REMOVE_USER_BY_ID = "DELETE FROM user WHERE id = ?";
+    String SELECT_ALL_USERS = "SELECT * FROM user";
+    String CLEAN_USERS_TABLE = "DELETE FROM user";
     private static final Connection connection = Util.getConnection();
 
     // SQL-запросы

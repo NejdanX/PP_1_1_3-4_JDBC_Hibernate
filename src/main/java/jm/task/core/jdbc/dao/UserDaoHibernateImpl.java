@@ -4,12 +4,10 @@ import jm.task.core.jdbc.model.User;
 import org.hibernate.Session;
 import jm.task.core.jdbc.util.Util;
 import org.hibernate.SessionFactory;
-import org.hibernate.query.Query;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
-    // Любое исключение вызываемое во время транзакции вызывает rollback() внутри Hibernate
     SessionFactory sessionFactory = Util.getSessionFactory();
 
     public UserDaoHibernateImpl() {
@@ -20,6 +18,12 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void createUsersTable() {
         // Создание таблицы User
+        String CREATE_USER_TABLE = "CREATE TABLE IF NOT EXISTS User (" +
+                    "id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT, " +
+                    "name VARCHAR(25), " +
+                    "last_name VARCHAR(25), " +
+                    "age TINYINT UNSIGNED" +
+                ")";
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
             session.createSQLQuery(CREATE_USER_TABLE).executeUpdate();
@@ -33,6 +37,7 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void dropUsersTable() {
         // Удаление таблицы User
+        String DROP_USER_TABLE = "DROP TABLE IF EXISTS User";
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
             session.createSQLQuery(DROP_USER_TABLE).executeUpdate();
@@ -77,8 +82,7 @@ public class UserDaoHibernateImpl implements UserDao {
         // Получение списка всех пользователей из таблицы User
         List<User> users = new ArrayList<>();
         try (Session session = sessionFactory.openSession()) {
-            Query query = session.createQuery("FROM " + User.class.getSimpleName());
-            users = (List<User>) query.getResultList();
+            users = session.createQuery("FROM User").list();
         }
         catch (Exception e) {
             System.out.println("При попытке получения списка пользователей произошла ошибка. Изменения отменены.");
@@ -92,7 +96,7 @@ public class UserDaoHibernateImpl implements UserDao {
         // Очистка таблицы User
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.createQuery("DELETE FROM " + User.class.getSimpleName()).executeUpdate();
+            session.createQuery("DELETE FROM User").executeUpdate();
             session.getTransaction().commit();
         } catch (Exception e) {
             System.out.println("Произошла ошибка при очистки таблицы User. Изменения отменены.");
