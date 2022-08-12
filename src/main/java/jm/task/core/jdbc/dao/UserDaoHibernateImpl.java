@@ -4,6 +4,8 @@ import jm.task.core.jdbc.model.User;
 import org.hibernate.Session;
 import jm.task.core.jdbc.util.Util;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +16,6 @@ public class UserDaoHibernateImpl implements UserDao {
 
     }
 
-
     @Override
     public void createUsersTable() {
         // Создание таблицы User
@@ -24,11 +25,13 @@ public class UserDaoHibernateImpl implements UserDao {
                     "last_name VARCHAR(25), " +
                     "age TINYINT UNSIGNED" +
                 ")";
-        try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        try (session) {
             session.createSQLQuery(CREATE_USER_TABLE).executeUpdate();
-            session.getTransaction().commit();
+            transaction.commit();
         } catch (Exception e) {
+            transaction.rollback();
             System.out.println("Произошла ошибка при создании таблицы User. Изменения отменены.");
             e.printStackTrace();
         }
@@ -38,11 +41,13 @@ public class UserDaoHibernateImpl implements UserDao {
     public void dropUsersTable() {
         // Удаление таблицы User
         String DROP_USER_TABLE = "DROP TABLE IF EXISTS User";
-        try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        try (session) {
             session.createSQLQuery(DROP_USER_TABLE).executeUpdate();
-            session.getTransaction().commit();
+            transaction.commit();
         } catch (Exception e) {
+            transaction.rollback();
             System.out.println("Произошла ошибка при удалении таблицы User. Изменения отменены.");
             e.printStackTrace();
         }
@@ -51,13 +56,15 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void saveUser(String name, String lastName, byte age) {
         // Добавление нового пользователя
-        try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        try (session) {
             User user = new User(name, lastName, age);
             session.save(user);
-            session.getTransaction().commit();
+            transaction.commit();
             System.out.printf("%s добавлен в базу данных\n", user);
         } catch (Exception e) {
+            transaction.rollback();
             System.out.println("При попытке добавления пользователя произошла ошибка. Изменения отменены.");
             e.printStackTrace();
         }
@@ -66,12 +73,14 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void removeUserById(long id) {
         // Удаление пользователя по id
-        try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        try (session) {
             session.delete(session.get(User.class, id));
-            session.getTransaction().commit();
+            transaction.commit();
             System.out.printf("User с id=%d удалён из базы данных\n", id);
         } catch (Exception e) {
+            transaction.rollback();
             System.out.println("При попытке удаления пользователя произошла ошибка. Изменения отменены.");
             e.printStackTrace();
         }
@@ -94,11 +103,13 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void cleanUsersTable() {
         // Очистка таблицы User
-        try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        try (session) {
             session.createQuery("DELETE FROM User").executeUpdate();
-            session.getTransaction().commit();
+            transaction.commit();
         } catch (Exception e) {
+            transaction.rollback();
             System.out.println("Произошла ошибка при очистки таблицы User. Изменения отменены.");
             e.printStackTrace();
         }
